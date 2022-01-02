@@ -13,3 +13,6 @@ exports.makeOrder = async (symbol, side, exchange, amount, sl, tp) => {
     console.log(err);
   }
 };
+
+
+console.log('yahel argas');
