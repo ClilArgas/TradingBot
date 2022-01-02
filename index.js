@@ -12,13 +12,10 @@ const exchange = new ccxt.binance({
   secret: process.env.API_SECRET,
 });
 exchange.createOrder;
-let candles,
-  hlc,
-  shortTrend,
-  longTrend,
-  inPosition = false;
+let candles, hlc, orderDetails;
+shortTrend, longTrend, (inPosition = false);
 const init = async () => {
-  candles = (await exchange.fetchOHLCV('ETH/USDT', '1h')).slice(0, -1);
+  candles = await exchange.fetchOHLCV('ETH/USDT', '1h');
   //candle[0] = date, candle[1] = openPrice, candle[2]=highPrice, candle[3]=lowestPrice, candle[4]=closePrice, candle[5]= volume, candle[6]=uptrend?
   candles.forEach(
     (candle) => (candle[0] = new Date(candle[0]).toLocaleString('he-IL'))
@@ -47,33 +44,45 @@ const main = async () => {
   }
 };
 main();
-
 const checkBuySellSignals = async (shortTrend, longTrend) => {
   //taking the last two candles and checking if there was a change in the trend and giving buy/sell signals & checking if the longTrend is an uptrend
-  const shortCrucialField = shortTrend.slice(-2);
-  const longCrucialField = longTrend.slice(-1);
+  const shortCrucialField = shortTrend.slice(-3, -1);
+  const longCrucialField = longTrend.slice(-2, -1);
   if (longCrucialField) {
     if (!shortCrucialField[0] && shortCrucialField[1]) {
       if (!inPosition) {
-        await exchange.createMarketOrder('ETH/USDT', 'buy', amount);
+        orderDetails = await orders.makeOrder('buy', exchange, 100, candles);
         inPosition = true;
       }
     }
     if (shortCrucialField[0] && !shortCrucialField[1]) {
       if (inPosition) {
-        await exchange.createMarketOrder('ETH/USDT', 'sell', amount);
+        await exchange.createMarketOrder(
+          'ETH/USDT',
+          'sell',
+          orderDetails.orderAmount
+        );
+        orderDetails = {};
+        inPosition = false;
       }
     }
     return;
   }
   if (shortCrucialField[0] && !shortCrucialField[1]) {
     if (!inPosition) {
-      await exchange.createMarketOrder('ETH/USDT', 'sell', amount);
+      orderDetails = await orders.makeOrder('sell', exchange, 100, candles);
+      inPosition = true;
     }
   }
   if (!shortCrucialField[0] && shortCrucialField[1]) {
     if (inPosition) {
-      await exchange.createMarketOrder('ETH/USDT', 'buy', amount);
+      await exchange.createMarketOrder(
+        'ETH/USDT',
+        'buy',
+        orderDetails.orderAmount
+      );
+      orderDetails = {};
+      inPosition = false;
     }
   }
 };
