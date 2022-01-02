@@ -18,7 +18,7 @@ let candles,
   longTrend,
   inPosition = false;
 const init = async () => {
-  candles = (await exchange.fetchOHLCV('ETH/USDT', '1m')).slice(0, -1);
+  candles = (await exchange.fetchOHLCV('ETH/USDT', '1h')).slice(0, -1);
   //candle[0] = date, candle[1] = openPrice, candle[2]=highPrice, candle[3]=lowestPrice, candle[4]=closePrice, candle[5]= volume, candle[6]=uptrend?
   candles.forEach(
     (candle) => (candle[0] = new Date(candle[0]).toLocaleString('he-IL'))
