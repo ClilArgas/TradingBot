@@ -9,7 +9,7 @@
   "author": "Clil Argas",
   "license": "ISC",
   "dependencies": {
-    "ccxt": "^1.65.26",
+    "ccxt": "^1.66.17",
     "dotenv": "^10.0.0",
     "node-schedule": "^2.1.0"
   }
