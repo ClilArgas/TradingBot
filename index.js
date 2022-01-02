@@ -88,4 +88,3 @@ rule.second = 1;
 process.on('SIGINT', () => {
   schedule.gracefulShutdown().then(() => process.exit(0));
 });
-console.log(1);
