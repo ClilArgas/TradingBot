@@ -35,6 +35,13 @@ const main = async () => {
     await init();
     shortTrend = ta.superTrend(candles, hlc);
     longTrend = ta.superTrend(candles, hlc, 20, 5);
+    candles.forEach((candle, i) => {
+      console.log({
+        candle,
+        shortTrend: shortTrend[i],
+        longTrend: longTrend[i],
+      });
+    });
   } catch (err) {
     console.log(err);
   }
