@@ -32,13 +32,6 @@ const main = async () => {
     await init();
     shortTrend = ta.superTrend(candles, hlc);
     longTrend = ta.superTrend(candles, hlc, 20, 5);
-    candles.forEach((candle, i) => {
-      console.log({
-        candle,
-        shortTrend: shortTrend[i],
-        longTrend: longTrend[i],
-      });
-    });
   } catch (err) {
     console.log(err);
   }
@@ -62,7 +55,7 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
           'sell',
           orderDetails.orderAmount
         );
-        orderDetails = {};
+        orderDetails = undefined;
         inPosition = false;
       }
     }
@@ -81,12 +74,15 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
         'buy',
         orderDetails.orderAmount
       );
-      orderDetails = {};
+      orderDetails = undefined;
       inPosition = false;
     }
   }
 };
-
+const checkSLTP = (shortTrend, longTrend) => {
+  const shortCrucialField = shortTrend.slice(-3, -1);
+  const longCrucialField = longTrend.slice(-2, -1);
+};
 const rule = new schedule.RecurrenceRule();
 rule.second = 1;
 // const fetchBars = schedule.scheduleJob(rule, async () => {
