@@ -19,7 +19,7 @@ let candles,
   longTrend,
   inPosition = false;
 const init = async () => {
-  candles = await exchange.fetchOHLCV('ETH/USDT', '1h');
+  candles = await exchange.fetchOHLCV('ETH/USDT', '15m');
   //candle[0] = date, candle[1] = openPrice, candle[2]=highPrice, candle[3]=lowestPrice, candle[4]=closePrice, candle[5]= volume, candle[6]=uptrend?
   candles.forEach(
     (candle) => (candle[0] = new Date(candle[0]).toLocaleString('he-IL'))
@@ -99,43 +99,6 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
       inPosition = false;
     }
   }
-  // if (longCrucialField) {
-  //   if (!shortCrucialField[0] && shortCrucialField[1]) {
-  //     if (!inPosition) {
-  //       orderDetails = await orders.makeOrder('buy', exchange, 100, candles);
-  //       inPosition = true;
-  //     }
-  //   }
-  //   if (shortCrucialField[0] && !shortCrucialField[1]) {
-  //     if (inPosition) {
-  //       await exchange.createMarketOrder(
-  //         'ETH/USDT',
-  //         'sell',
-  //         orderDetails.orderAmount
-  //       );
-  //       orderDetails = undefined;
-  //       inPosition = false;
-  //     }
-  //   }
-  //   return;
-  // }
-  // if (shortCrucialField[0] && !shortCrucialField[1]) {
-  //   if (!inPosition) {
-  //     orderDetails = await orders.makeOrder('sell', exchange, 100, candles);
-  //     inPosition = true;
-  //   }
-  // }
-  // if (!shortCrucialField[0] && shortCrucialField[1]) {
-  //   if (inPosition) {
-  //     await exchange.createMarketOrder(
-  //       'ETH/USDT',
-  //       'buy',
-  //       orderDetails.orderAmount
-  //     );
-  //     orderDetails = undefined;
-  //     inPosition = false;
-  //   }
-  // }
 };
 const checkSLTP = async (orderDetails) => {
   if (!inPosition) return;
@@ -199,13 +162,13 @@ const checkSLTP = async (orderDetails) => {
 };
 const rule = new schedule.RecurrenceRule();
 rule.second = 1;
-const fetchBars = schedule.scheduleJob(
-  '0,5,10,15,20,25,30,35,40,45,50,55 * * * * *',
-  async () => {
-    await main();
-    console.log(candles[candles.length - 1][4]);
-  }
-);
+// const fetchBars = schedule.scheduleJob(
+//   '0,5,10,15,20,25,30,35,40,45,50,55 * * * * *',
+//   async () => {
+//     await main();
+//     console.log(candles[candles.length - 1][4]);
+//   }
+// );
 
 process.on('SIGINT', () => {
   schedule.gracefulShutdown().then(() => process.exit(0));
