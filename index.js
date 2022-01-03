@@ -12,7 +12,6 @@ const exchange = new ccxt.binance({
   apiKey: process.env.API_KEY,
   secret: process.env.API_SECRET,
 });
-exchange.createOrder;
 let candles,
   hlc,
   orderDetails,
@@ -52,7 +51,7 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
   ) {
     if (!inPosition) {
       orderDetails = await orders.makeOrder('buy', exchange, 100, candles);
-      console.log("make a buy order");
+      console.log('make a buy order');
       console.log(candles[candles.length - 1][4]);
       inPosition = true;
     }
@@ -65,9 +64,9 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
       //const order = await exchange.createMarketOrder(
       //  'ETH/USDT',
       //  'sell',
-     //   orderDetails.orderAmount
-     // );
-      console.log("make a sell oreder");
+      //   orderDetails.orderAmount
+      // );
+      console.log('make a sell oreder');
       console.log(candles[candles.length - 1][4]);
       orderDetails = undefined;
       inPosition = false;
@@ -79,7 +78,7 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
   ) {
     if (!inPosition) {
       orderDetails = await orders.makeOrder('sell', exchange, 100, candles);
-      console.log("make a sell oreder");
+      console.log('make a sell oreder');
       console.log(candles[candles.length - 1][4]);
       inPosition = true;
     }
@@ -91,10 +90,10 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
     if (inPosition) {
       //const order = await exchange.createMarketOrder(
       //  'ETH/USDT',
-     //   'buy',
-     //   orderDetails.orderAmount
-     // );
-      console.log("make a buy order");
+      //   'buy',
+      //   orderDetails.orderAmount
+      // );
+      console.log('make a buy order');
       console.log(candles[candles.length - 1][4]);
       orderDetails = undefined;
       inPosition = false;
@@ -146,22 +145,22 @@ const checkSLTP = async (orderDetails) => {
     const currPrice = candles[candles.length - 1][4];
     if (currPrice >= tp) {
       //const order = await exchange.createMarketOrder(
-     //   'ETH/USDT',
+      //   'ETH/USDT',
       //  'sell',
       //  orderDetails.orderAmount
-    //  );
-      console.log("make a sell order");
+      //  );
+      console.log('make a sell order');
       console.log(currPrice);
       orderDetails = undefined;
       inPosition = false;
     }
     if (currPrice <= sl) {
-     // const order = await exchange.createMarketOrder(
+      // const order = await exchange.createMarketOrder(
       //  'ETH/USDT',
       //  'sell',
       //  orderDetails.orderAmount
       //);
-      console.log("make a sell order");
+      console.log('make a sell order');
       console.log(currPrice);
       //console.log(order);
       orderDetails = undefined;
@@ -179,7 +178,7 @@ const checkSLTP = async (orderDetails) => {
       //   orderDetails.orderAmount
       // );
       //console.log(order);
-      console.log("make a buy order");
+      console.log('make a buy order');
       console.log(currPrice);
       orderDetails = undefined;
       inPosition = false;
@@ -190,7 +189,7 @@ const checkSLTP = async (orderDetails) => {
       //   'buy',
       //   orderDetails.orderAmount
       // );
-      console.log("make a buy order");
+      console.log('make a buy order');
       console.log(currPrice);
       //console.log(order);
       orderDetails = undefined;
