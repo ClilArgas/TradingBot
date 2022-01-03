@@ -20,7 +20,7 @@ let candles,
   inPosition = false;
 const init = async () => {
   candles = await exchange.fetchOHLCV('ETH/USDT', '15m');
-  //candle[0] = date, candle[1] = openPrice, candle[2]=highPrice, candle[3]=lowestPrice, candle[4]=closePrice, candle[5]= volume, candle[6]=uptrend?
+  //candle[0] = date, candle[1] = openPrice, candle[2]=highPrice, candle[3]=lowestPrice, candle[4]=closePrice, candle[5]= volume
   candles.forEach(
     (candle) => (candle[0] = new Date(candle[0]).toLocaleString('he-IL'))
   );
@@ -36,6 +36,7 @@ const main = async () => {
     await init();
     shortTrend = ta.superTrend(candles, hlc);
     longTrend = ta.superTrend(candles, hlc, 20, 5);
+    candles.forEach((candle, i) => {console.log({candle, shortTrend: shortTrend[i], longTrend: longTrend[i]})})
   } catch (err) {
     console.log(err);
   }
@@ -45,21 +46,17 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
   //taking the last two candles and checking if there was a change in the trend and giving buy/sell signals & checking if the longTrend is an uptrend
   const shortCrucialField = shortTrend.slice(-3, -1);
   const longCrucialField = longTrend.slice(-3, -1);
-  if (
-    (longCrucialField[1] && !shortCrucialField[0] && shortCrucialField[1]) ||
-    (shortCrucialField[1] && !longCrucialField[0] && longCrucialField[1])
-  ) {
+  if ( (longCrucialField[1] && !shortCrucialField[0] && shortCrucialField[1]) || (shortCrucialField[1] && !longCrucialField[0] && longCrucialField[1] ) )
+    {
     if (!inPosition) {
       orderDetails = await orders.makeOrder('buy', exchange, 100, candles);
       console.log('make a buy order');
       console.log(candles[candles.length - 1][4]);
       inPosition = true;
+      }
     }
-  }
-  if (
-    (shortCrucialField[0] && !shortCrucialField[1]) ||
-    (longCrucialField[0] && !longCrucialField[1])
-  ) {
+  if ( (shortCrucialField[0] && !shortCrucialField[1]) || (longCrucialField[0] && !longCrucialField[1])) 
+  {
     if (inPosition) {
       //const order = await exchange.createMarketOrder(
       //  'ETH/USDT',
@@ -72,10 +69,8 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
       inPosition = false;
     }
   }
-  if (
-    (!longCrucialField[1] && shortCrucialField[0] && !shortCrucialField[1]) ||
-    (!shortCrucialField[1] && longCrucialField[0] && !longCrucialField[1])
-  ) {
+  if ( (!longCrucialField[1] && shortCrucialField[0] && !shortCrucialField[1]) || (!shortCrucialField[1] && longCrucialField[0] && !longCrucialField[1])) 
+  {
     if (!inPosition) {
       orderDetails = await orders.makeOrder('sell', exchange, 100, candles);
       console.log('make a sell oreder');
@@ -83,10 +78,7 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
       inPosition = true;
     }
   }
-  if (
-    (!shortCrucialField[0] && shortCrucialField[1]) ||
-    (!longCrucialField[0] && longCrucialField[1])
-  ) {
+  if ( (!shortCrucialField[0] && shortCrucialField[1]) || (!longCrucialField[0] && longCrucialField[1]) ) {
     if (inPosition) {
       //const order = await exchange.createMarketOrder(
       //  'ETH/USDT',
