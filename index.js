@@ -4,7 +4,8 @@ const ccxt = require('ccxt');
 const ta = require('./utils/ta');
 const orders = require('./utils/orders');
 
-const amount = 0.004;
+const SL_PRECENTAGE = 0.015;
+const TP_PRECENTAGE = 0.03;
 
 dotenv.config({ path: './config.env' });
 const exchange = new ccxt.binance({
@@ -134,8 +135,8 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
 const checkSLTP = async (orderDetails) => {
   if (!inPosition) return;
   if (orderDetails.orderSide === 'buy') {
-    const sl = orderDetails.orderPrice * 0.985;
-    const tp = orderDetails.orderPrice * 1.03;
+    const sl = orderDetails.orderPrice * (1 - SL_PRECENTAGE);
+    const tp = orderDetails.orderPrice * (1 + TP_PRECENTAGE);
     const currPrice = candles[candles.length - 1][4];
     if (currPrice >= tp) {
       const order = await exchange.createMarketOrder(
@@ -159,8 +160,8 @@ const checkSLTP = async (orderDetails) => {
     }
   }
   if (orderDetails.orderSide === 'sell') {
-    const sl = orderDetails.orderPrice * 1.015;
-    const tp = orderDetails.orderPrice * 0.97;
+    const sl = orderDetails.orderPrice * (1 + SL_PRECENTAGE);
+    const tp = orderDetails.orderPrice * (1 - TP_PRECENTAGE);
     const currPrice = candles[candles.length - 1][4];
     if (currPrice <= tp) {
       const order = await exchange.createMarketOrder(
