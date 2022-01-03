@@ -12,8 +12,7 @@ const exchange = new ccxt.binance({
   secret: process.env.API_SECRET,
 });
 exchange.createOrder;
-let candles, hlc, orderDetails;
-shortTrend, longTrend, (inPosition = false);
+let candles, hlc, orderDetails, shortTrend, longTrend, inPosition = false;
 const init = async () => {
   candles = await exchange.fetchOHLCV('ETH/USDT', '1h');
   //candle[0] = date, candle[1] = openPrice, candle[2]=highPrice, candle[3]=lowestPrice, candle[4]=closePrice, candle[5]= volume, candle[6]=uptrend?
