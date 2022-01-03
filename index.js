@@ -52,6 +52,8 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
   ) {
     if (!inPosition) {
       orderDetails = await orders.makeOrder('buy', exchange, 100, candles);
+      console.log("make a buy order");
+      console.log(candles[candles.length - 1][4]);
       inPosition = true;
     }
   }
@@ -60,12 +62,13 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
     (longCrucialField[0] && !longCrucialField[1])
   ) {
     if (inPosition) {
-      const order = await exchange.createMarketOrder(
-        'ETH/USDT',
-        'sell',
-        orderDetails.orderAmount
-      );
-      console.log(order);
+      //const order = await exchange.createMarketOrder(
+      //  'ETH/USDT',
+      //  'sell',
+     //   orderDetails.orderAmount
+     // );
+      console.log("make a sell oreder");
+      console.log(candles[candles.length - 1][4]);
       orderDetails = undefined;
       inPosition = false;
     }
@@ -76,6 +79,8 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
   ) {
     if (!inPosition) {
       orderDetails = await orders.makeOrder('sell', exchange, 100, candles);
+      console.log("make a sell oreder");
+      console.log(candles[candles.length - 1][4]);
       inPosition = true;
     }
   }
@@ -84,12 +89,13 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
     (!longCrucialField[0] && longCrucialField[1])
   ) {
     if (inPosition) {
-      const order = await exchange.createMarketOrder(
-        'ETH/USDT',
-        'buy',
-        orderDetails.orderAmount
-      );
-      console.log(order);
+      //const order = await exchange.createMarketOrder(
+      //  'ETH/USDT',
+     //   'buy',
+     //   orderDetails.orderAmount
+     // );
+      console.log("make a buy order");
+      console.log(candles[candles.length - 1][4]);
       orderDetails = undefined;
       inPosition = false;
     }
@@ -139,22 +145,25 @@ const checkSLTP = async (orderDetails) => {
     const tp = orderDetails.orderPrice * (1 + TP_PRECENTAGE);
     const currPrice = candles[candles.length - 1][4];
     if (currPrice >= tp) {
-      const order = await exchange.createMarketOrder(
-        'ETH/USDT',
-        'sell',
-        orderDetails.orderAmount
-      );
-      console.log(order);
+      //const order = await exchange.createMarketOrder(
+     //   'ETH/USDT',
+      //  'sell',
+      //  orderDetails.orderAmount
+    //  );
+      console.log("make a sell order");
+      console.log(currPrice);
       orderDetails = undefined;
       inPosition = false;
     }
     if (currPrice <= sl) {
-      const order = await exchange.createMarketOrder(
-        'ETH/USDT',
-        'sell',
-        orderDetails.orderAmount
-      );
-      console.log(order);
+     // const order = await exchange.createMarketOrder(
+      //  'ETH/USDT',
+      //  'sell',
+      //  orderDetails.orderAmount
+      //);
+      console.log("make a sell order");
+      console.log(currPrice);
+      //console.log(order);
       orderDetails = undefined;
       inPosition = false;
     }
@@ -164,22 +173,26 @@ const checkSLTP = async (orderDetails) => {
     const tp = orderDetails.orderPrice * (1 - TP_PRECENTAGE);
     const currPrice = candles[candles.length - 1][4];
     if (currPrice <= tp) {
-      const order = await exchange.createMarketOrder(
-        'ETH/USDT',
-        'buy',
-        orderDetails.orderAmount
-      );
-      console.log(order);
+      // const order = await exchange.createMarketOrder(
+      //   'ETH/USDT',
+      //   'buy',
+      //   orderDetails.orderAmount
+      // );
+      //console.log(order);
+      console.log("make a buy order");
+      console.log(currPrice);
       orderDetails = undefined;
       inPosition = false;
     }
     if (currPrice >= sl) {
-      const order = await exchange.createMarketOrder(
-        'ETH/USDT',
-        'buy',
-        orderDetails.orderAmount
-      );
-      console.log(order);
+      // const order = await exchange.createMarketOrder(
+      //   'ETH/USDT',
+      //   'buy',
+      //   orderDetails.orderAmount
+      // );
+      console.log("make a buy order");
+      console.log(currPrice);
+      //console.log(order);
       orderDetails = undefined;
       inPosition = false;
     }

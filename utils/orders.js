@@ -12,8 +12,8 @@ exports.makeOrder = async (side, exchange, precentage = 100, candles) => {
     const amount =
       (usdtBalance / candles[candles.length - 1][4]) *
       ((0.99 * precentage) / 100);
-    const order = await exchange.createMarketOrder('ETH/USDT', side, amount);
-    console.log(order);
+    //const order = await exchange.createMarketOrder('ETH/USDT', side, amount);
+    //console.log(order);
     //returns the price oreders
     const orderDetails = {
       orderPrice: candles[candles.length - 1][4],
