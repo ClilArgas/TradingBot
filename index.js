@@ -36,13 +36,6 @@ const main = async () => {
     await init();
     shortTrend = ta.superTrend(candles, hlc);
     longTrend = ta.superTrend(candles, hlc, 20, 5);
-    candles.forEach((candle, i) => {
-      console.log({
-        candle,
-        shortTrend: shortTrend[i],
-        longTrend: longTrend[i],
-      });
-    });
   } catch (err) {
     console.log(err);
   }
@@ -173,9 +166,13 @@ rule.second = 1;
 const fetchBars = schedule.scheduleJob(
   '0,5,10,15,20,25,30,35,40,45,50,55 * * * * *',
   async () => {
-    await main();
-    await checkBuySellSignals(shortTrend, longTrend, orderDetails);
-    await checkSLTP(orderDetails);
+    try {
+      await main();
+      await checkBuySellSignals(shortTrend, longTrend);
+      await checkSLTP(orderDetails);
+    } catch (err) {
+      console.log(err);
+    }
   }
 );
 
