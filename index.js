@@ -4,8 +4,8 @@ const ccxt = require('ccxt');
 const ta = require('./utils/ta');
 const orders = require('./utils/orders');
 
-const SL_PRECENTAGE = 0.015;
-const TP_PRECENTAGE = 0.03;
+const SL_PRECENTAGE = 0.005;
+const TP_PRECENTAGE = 0.01;
 
 dotenv.config({ path: './config.env' });
 const exchange = new ccxt.binance({
@@ -41,7 +41,7 @@ const main = async () => {
   }
 };
 main();
-const checkBuySellSignals = async (shortTrend, longTrend) => {
+const checkBuySellSignals = async (shortTrend, longTrend, orderDetails) => {
   //taking the last two candles and checking if there was a change in the trend and giving buy/sell signals & checking if the longTrend is an uptrend
   const shortCrucialField = shortTrend.slice(-3, -1);
   const longCrucialField = longTrend.slice(-3, -1);
@@ -60,7 +60,7 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
     (shortCrucialField[0] && !shortCrucialField[1]) ||
     (longCrucialField[0] && !longCrucialField[1])
   ) {
-    if (inPosition) {
+    if (inPosition && orderDetails.orderSide === 'buy') {
       //const order = await exchange.createMarketOrder(
       //  'ETH/USDT',
       //  'sell',
@@ -87,7 +87,7 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
     (!shortCrucialField[0] && shortCrucialField[1]) ||
     (!longCrucialField[0] && longCrucialField[1])
   ) {
-    if (inPosition) {
+    if (inPosition && orderDetails.orderSide === 'sell') {
       //const order = await exchange.createMarketOrder(
       //  'ETH/USDT',
       //   'buy',
@@ -162,13 +162,14 @@ const checkSLTP = async (orderDetails) => {
 };
 const rule = new schedule.RecurrenceRule();
 rule.second = 1;
-// const fetchBars = schedule.scheduleJob(
-//   '0,5,10,15,20,25,30,35,40,45,50,55 * * * * *',
-//   async () => {
-//     await main();
-//     console.log(candles[candles.length - 1][4]);
-//   }
-// );
+const fetchBars = schedule.scheduleJob(
+  '0,5,10,15,20,25,30,35,40,45,50,55 * * * * *',
+  async () => {
+    await main();
+    await checkBuySellSignals(shortTrend, longTrend, orderDetails);
+    await checkSLTP(orderDetails);
+  }
+);
 
 process.on('SIGINT', () => {
   schedule.gracefulShutdown().then(() => process.exit(0));
