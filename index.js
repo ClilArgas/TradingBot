@@ -68,7 +68,6 @@ const checkFields = async function (shortCrucialField, longCrucialField, side) {
       timeOfStopLossTakeProfit !== candles[candles.length - 1][0]
     ) {
       orderDetails = await orders.makeOrder(`${side}`, exchange, 100, candles);
-      console.log(`make a ${side} order`);
       console.log(candles[candles.length - 1][4]);
       inPosition = true;
     }
@@ -76,12 +75,12 @@ const checkFields = async function (shortCrucialField, longCrucialField, side) {
 
   if (conditionGetOutOfPosition) {
     if (inPosition && orderDetails.orderSide === `${side}`) {
-      //const order = await exchange.createMarketOrder(
-      //  'ETH/USDT',
-      //  'sell',
-      //   orderDetails.orderAmount
-      // );
-      console.log(`make a ${otherSide} order`);
+      const order = await exchange.createMarketOrder(
+        'ETH/USDT',
+        'sell',
+        orderDetails.orderAmount
+      );
+      console.log(order);
       console.log(candles[candles.length - 1][4]);
       orderDetails = undefined;
       inPosition = false;
@@ -90,8 +89,8 @@ const checkFields = async function (shortCrucialField, longCrucialField, side) {
 };
 const checkBuySellSignals = async (shortTrend, longTrend) => {
   //taking the last two candles and checking if there was a change in the trend and giving buy/sell signals & checking if the longTrend is an uptrend
-  const shortCrucialField = [true, false];
-  const longCrucialField = [true, false];
+  const shortCrucialField = shortTrend.slice(-3, -1);
+  const longCrucialField = longTrend.slice(-3, -1);
   await checkFields(shortCrucialField, longCrucialField, 'buy');
   await checkFields(shortCrucialField, longCrucialField, 'sell');
 };
@@ -102,26 +101,25 @@ const checkSLTP = async (orderDetails) => {
     const tp = orderDetails.orderPrice * (1 + TP_PRECENTAGE);
     const currPrice = candles[candles.length - 1][4];
     if (currPrice >= tp) {
-      //const order = await exchange.createMarketOrder(
-      //   'ETH/USDT',
-      //  'sell',
-      //  orderDetails.orderAmount
-      //  );
-      console.log('make a sell order');
+      const order = await exchange.createMarketOrder(
+        'ETH/USDT',
+        'sell',
+        orderDetails.orderAmount
+      );
+      console.log(order);
       console.log(currPrice);
       orderDetails = undefined;
       inPosition = false;
       timeOfStopLossTakeProfit = candles[candles.length - 1][0];
     }
     if (currPrice <= sl) {
-      // const order = await exchange.createMarketOrder(
-      //  'ETH/USDT',
-      //  'sell',
-      //  orderDetails.orderAmount
-      //);
-      console.log('make a sell order');
+      const order = await exchange.createMarketOrder(
+        'ETH/USDT',
+        'sell',
+        orderDetails.orderAmount
+      );
+      console.log(order);
       console.log(currPrice);
-      //console.log(order);
       orderDetails = undefined;
       inPosition = false;
       timeOfStopLossTakeProfit = candles[candles.length - 1][0];
@@ -132,27 +130,25 @@ const checkSLTP = async (orderDetails) => {
     const tp = orderDetails.orderPrice * (1 - TP_PRECENTAGE);
     const currPrice = candles[candles.length - 1][4];
     if (currPrice <= tp) {
-      // const order = await exchange.createMarketOrder(
-      //   'ETH/USDT',
-      //   'buy',
-      //   orderDetails.orderAmount
-      // );
-      //console.log(order);
-      console.log('make a buy order');
+      const order = await exchange.createMarketOrder(
+        'ETH/USDT',
+        'buy',
+        orderDetails.orderAmount
+      );
+      console.log(order);
       console.log(currPrice);
       orderDetails = undefined;
       inPosition = false;
       timeOfStopLossTakeProfit = candles[candles.length - 1][0];
     }
     if (currPrice >= sl) {
-      // const order = await exchange.createMarketOrder(
-      //   'ETH/USDT',
-      //   'buy',
-      //   orderDetails.orderAmount
-      // );
-      console.log('make a buy order');
+      const order = await exchange.createMarketOrder(
+        'ETH/USDT',
+        'buy',
+        orderDetails.orderAmount
+      );
       console.log(currPrice);
-      //console.log(order);
+      console.log(order);
       orderDetails = undefined;
       inPosition = false;
       timeOfStopLossTakeProfit = candles[candles.length - 1][0];
