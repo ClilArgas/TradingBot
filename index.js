@@ -18,6 +18,7 @@ let candles,
   shortTrend,
   longTrend,
   inPosition = false;
+let timeOfStopLossTakeProfit = 1;
 const init = async () => {
   candles = await exchange.fetchOHLCV('ETH/USDT', '15m');
   //candle[0] = date, candle[1] = openPrice, candle[2]=highPrice, candle[3]=lowestPrice, candle[4]=closePrice, candle[5]= volume
@@ -41,65 +42,58 @@ const main = async () => {
   }
 };
 main();
-const checkBuySellSignals = async (shortTrend, longTrend) => {
-  //taking the last two candles and checking if there was a change in the trend and giving buy/sell signals & checking if the longTrend is an uptrend
-  const shortCrucialField = shortTrend.slice(-3, -1);
-  const longCrucialField = longTrend.slice(-3, -1);
-  if (
-    (longCrucialField[1] && !shortCrucialField[0] && shortCrucialField[1]) ||
-    (shortCrucialField[1] && !longCrucialField[0] && longCrucialField[1])
-  ) {
-    if (!inPosition) {
-      orderDetails = await orders.makeOrder('buy', exchange, 100, candles);
-      console.log('make a buy order');
+const checkFields = async function (shortCrucialField, longCrucialField, side) {
+  const otherSide = side === 'buy' ? 'sell' : 'buy';
+  //checking if theres a change in trends, that both sides are in the same trend thats the GetIn signal
+  const conditionGetInPosition =
+    side === 'buy'
+      ? (longCrucialField[1] &&
+          !shortCrucialField[0] &&
+          shortCrucialField[1]) ||
+        (shortCrucialField[1] && !longCrucialField[0] && longCrucialField[1])
+      : (!longCrucialField[1] &&
+          shortCrucialField[0] &&
+          !shortCrucialField[1]) ||
+        (!shortCrucialField[1] && longCrucialField[0] && !longCrucialField[1]);
+  // checking if theres a change in one of the trends, so if there are not the same thats the getoutOfposition signal
+  const conditionGetOutOfPosition =
+    side === 'buy'
+      ? (shortCrucialField[0] && !shortCrucialField[1]) ||
+        (longCrucialField[0] && !longCrucialField[1])
+      : (!shortCrucialField[0] && shortCrucialField[1]) ||
+        (!longCrucialField[0] && longCrucialField[1]);
+  if (conditionGetInPosition) {
+    if (
+      !inPosition &&
+      timeOfStopLossTakeProfit !== candles[candles.length - 1][0]
+    ) {
+      orderDetails = await orders.makeOrder(`${side}`, exchange, 100, candles);
+      console.log(`make a ${side} order`);
       console.log(candles[candles.length - 1][4]);
       inPosition = true;
     }
   }
 
-  if (
-    (shortCrucialField[0] && !shortCrucialField[1]) ||
-    (longCrucialField[0] && !longCrucialField[1])
-  ) {
-    if (inPosition && orderDetails.orderSide === 'buy') {
+  if (conditionGetOutOfPosition) {
+    if (inPosition && orderDetails.orderSide === `${side}`) {
       //const order = await exchange.createMarketOrder(
       //  'ETH/USDT',
       //  'sell',
       //   orderDetails.orderAmount
       // );
-      console.log('make a sell oreder');
+      console.log(`make a ${otherSide} order`);
       console.log(candles[candles.length - 1][4]);
       orderDetails = undefined;
       inPosition = false;
     }
   }
-  if (
-    (!longCrucialField[1] && shortCrucialField[0] && !shortCrucialField[1]) ||
-    (!shortCrucialField[1] && longCrucialField[0] && !longCrucialField[1])
-  ) {
-    if (!inPosition) {
-      orderDetails = await orders.makeOrder('sell', exchange, 100, candles);
-      console.log('make a sell oreder');
-      console.log(candles[candles.length - 1][4]);
-      inPosition = true;
-    }
-  }
-  if (
-    (!shortCrucialField[0] && shortCrucialField[1]) ||
-    (!longCrucialField[0] && longCrucialField[1])
-  ) {
-    if (inPosition && orderDetails.orderSide === 'sell') {
-      //const order = await exchange.createMarketOrder(
-      //  'ETH/USDT',
-      //   'buy',
-      //   orderDetails.orderAmount
-      // );
-      console.log('make a buy order');
-      console.log(candles[candles.length - 1][4]);
-      orderDetails = undefined;
-      inPosition = false;
-    }
-  }
+};
+const checkBuySellSignals = async (shortTrend, longTrend) => {
+  //taking the last two candles and checking if there was a change in the trend and giving buy/sell signals & checking if the longTrend is an uptrend
+  const shortCrucialField = [true, false];
+  const longCrucialField = [true, false];
+  await checkFields(shortCrucialField, longCrucialField, 'buy');
+  await checkFields(shortCrucialField, longCrucialField, 'sell');
 };
 const checkSLTP = async (orderDetails) => {
   if (!inPosition) return;
@@ -117,6 +111,7 @@ const checkSLTP = async (orderDetails) => {
       console.log(currPrice);
       orderDetails = undefined;
       inPosition = false;
+      timeOfStopLossTakeProfit = candles[candles.length - 1][0];
     }
     if (currPrice <= sl) {
       // const order = await exchange.createMarketOrder(
@@ -129,6 +124,7 @@ const checkSLTP = async (orderDetails) => {
       //console.log(order);
       orderDetails = undefined;
       inPosition = false;
+      timeOfStopLossTakeProfit = candles[candles.length - 1][0];
     }
   }
   if (orderDetails.orderSide === 'sell') {
@@ -146,6 +142,7 @@ const checkSLTP = async (orderDetails) => {
       console.log(currPrice);
       orderDetails = undefined;
       inPosition = false;
+      timeOfStopLossTakeProfit = candles[candles.length - 1][0];
     }
     if (currPrice >= sl) {
       // const order = await exchange.createMarketOrder(
@@ -158,6 +155,7 @@ const checkSLTP = async (orderDetails) => {
       //console.log(order);
       orderDetails = undefined;
       inPosition = false;
+      timeOfStopLossTakeProfit = candles[candles.length - 1][0];
     }
   }
 };
