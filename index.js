@@ -89,8 +89,10 @@ const checkFields = async function (shortCrucialField, longCrucialField, side) {
 };
 const checkBuySellSignals = async (shortTrend, longTrend) => {
   //taking the last two candles and checking if there was a change in the trend and giving buy/sell signals & checking if the longTrend is an uptrend
-  const shortCrucialField = shortTrend.slice(-3, -1);
-  const longCrucialField = longTrend.slice(-3, -1);
+  // const shortCrucialField = shortTrend.slice(-3, -1);
+  // const longCrucialField = longTrend.slice(-3, -1);
+  const shortCrucialField = [false, true];
+  const longCrucialField = [false, true];
   await checkFields(shortCrucialField, longCrucialField, 'buy');
   await checkFields(shortCrucialField, longCrucialField, 'sell');
 };

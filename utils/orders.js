@@ -18,7 +18,7 @@ exports.makeOrder = async (side, exchange, precentage = 100, candles) => {
     const orderDetails = {
       orderPrice: candles[candles.length - 1][4],
       orderSide: side,
-      orderAmount: amount,
+      orderAmount: order.amount-order.fees[0].cost,
     };
     return orderDetails;
   } catch (err) {
