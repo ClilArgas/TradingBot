@@ -89,16 +89,14 @@ const checkFields = async function (shortCrucialField, longCrucialField, side) {
 };
 const checkBuySellSignals = async (shortTrend, longTrend) => {
   //taking the last two candles and checking if there was a change in the trend and giving buy/sell signals & checking if the longTrend is an uptrend
-  // const shortCrucialField = shortTrend.slice(-3, -1);
-  // const longCrucialField = longTrend.slice(-3, -1);
-  const shortCrucialField = [false, true];
-  const longCrucialField = [false, true];
+  const shortCrucialField = shortTrend.slice(-3, -1);
+  const longCrucialField = longTrend.slice(-3, -1);
   await checkFields(shortCrucialField, longCrucialField, 'buy');
   await checkFields(shortCrucialField, longCrucialField, 'sell');
 };
 const checkSLTP = async (orderDetails) => {
   if (!inPosition) return;
-  if (orderDetails.orderSide === 'buy') {
+  if (orderDetails &&  orderDetails.orderSide === 'buy') {
     const sl = orderDetails.orderPrice * (1 - SL_PRECENTAGE);
     const tp = orderDetails.orderPrice * (1 + TP_PRECENTAGE);
     const currPrice = candles[candles.length - 1][4];
@@ -127,7 +125,7 @@ const checkSLTP = async (orderDetails) => {
       timeOfStopLossTakeProfit = candles[candles.length - 1][0];
     }
   }
-  if (orderDetails.orderSide === 'sell') {
+  if (orderDetails && orderDetails.orderSide === 'sell') {
     const sl = orderDetails.orderPrice * (1 + SL_PRECENTAGE);
     const tp = orderDetails.orderPrice * (1 - TP_PRECENTAGE);
     const currPrice = candles[candles.length - 1][4];
