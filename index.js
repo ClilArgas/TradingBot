@@ -67,17 +67,17 @@ const checkFields = async function (shortCrucialField, longCrucialField, side) {
       !inPosition &&
       timeOfStopLossTakeProfit !== candles[candles.length - 1][0]
     ) {
-      orderDetails = await orders.makeOrder(`${side}`, exchange, 100, candles);
+      orderDetails = await orders.makeOrder(side, exchange, 100, candles);
       console.log(candles[candles.length - 1][4]);
       inPosition = true;
     }
   }
 
   if (conditionGetOutOfPosition) {
-    if (inPosition && orderDetails.orderSide === `${side}`) {
+    if (inPosition && orderDetails?.orderSide === side) {
       const order = await exchange.createMarketOrder(
         'ETH/USDT',
-        'sell',
+        otherSide,
         orderDetails.orderAmount
       );
       console.log(order);
@@ -96,7 +96,7 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
 };
 const checkSLTP = async (orderDetails) => {
   if (!inPosition) return;
-  if (orderDetails &&  orderDetails.orderSide === 'buy') {
+  if (orderDetails && orderDetails.orderSide === 'buy') {
     const sl = orderDetails.orderPrice * (1 - SL_PRECENTAGE);
     const tp = orderDetails.orderPrice * (1 + TP_PRECENTAGE);
     const currPrice = candles[candles.length - 1][4];
