@@ -105,59 +105,29 @@ const checkSLTP = async (orderDetails) => {
     const sl = orderDetails.orderPrice * (1 - SL_PRECENTAGE);
     const tp = orderDetails.orderPrice * (1 + TP_PRECENTAGE);
     const currPrice = candles[candles.length - 1][4];
-    if (currPrice >= tp) {
-      const order = await exchange.createMarketOrder(
-        'ETH/USDT',
-        'sell',
-        orderDetails.orderAmount
-      );
-      console.log(order);
-      console.log(currPrice);
-      orderDetails = undefined;
-      inPosition = false;
-      timeOfStopLossTakeProfit = candles[candles.length - 1][0];
-    }
-    if (currPrice <= sl) {
-      const order = await exchange.createMarketOrder(
-        'ETH/USDT',
-        'sell',
-        orderDetails.orderAmount
-      );
-      console.log(order);
-      console.log(currPrice);
-      orderDetails = undefined;
-      inPosition = false;
-      timeOfStopLossTakeProfit = candles[candles.length - 1][0];
-    }
+    const conditionStopLoss = currPrice <= sl;
+    const conditionTakeProfit = currPrice >= tp;
+    const otherSide = 'sell';
   }
   if (orderDetails && orderDetails.orderSide === 'sell') {
     const sl = orderDetails.orderPrice * (1 + SL_PRECENTAGE);
     const tp = orderDetails.orderPrice * (1 - TP_PRECENTAGE);
     const currPrice = candles[candles.length - 1][4];
-    if (currPrice <= tp) {
-      const order = await exchange.createMarketOrder(
-        'ETH/USDT',
-        'buy',
-        orderDetails.orderAmount
-      );
-      console.log(order);
-      console.log(currPrice);
-      orderDetails = undefined;
-      inPosition = false;
-      timeOfStopLossTakeProfit = candles[candles.length - 1][0];
-    }
-    if (currPrice >= sl) {
-      const order = await exchange.createMarketOrder(
-        'ETH/USDT',
-        'buy',
-        orderDetails.orderAmount
-      );
-      console.log(currPrice);
-      console.log(order);
-      orderDetails = undefined;
-      inPosition = false;
-      timeOfStopLossTakeProfit = candles[candles.length - 1][0];
-    }
+    const conditionStopLoss = currPrice >= sl;
+    const conditionTakeProfit = currPrice <= tp;
+    const otherSide = 'buy';
+  }
+  if (conditionTakeProfit || conditionStopLoss) {
+    const order = await exchange.createMarketOrder(
+      'ETH/USDT',
+      otherSide,
+      orderDetails.orderAmount
+    );
+    console.log(order);
+    console.log(currPrice);
+    orderDetails = undefined;
+    inPosition = false;
+    timeOfStopLossTakeProfit = candles[candles.length - 1][0];
   }
 };
 const rule = new schedule.RecurrenceRule();
