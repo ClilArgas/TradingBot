@@ -28,7 +28,14 @@ const averageTrueRange = (hlc, period = 14) => {
   return atr;
   // console.log(candles);
 };
-
+/**
+ *
+ * @param {Array} candles
+ * @param {Array} hlc
+ * @param {Number} period
+ * @param {Number} multiplier
+ * @returns {Array} the status of the trend past the last 2 candles
+ */
 exports.superTrend = (candles, hlc, period = 10, multiplier = 3) => {
   const atr = averageTrueRange(hlc, period);
   const upperBand = [];
@@ -56,5 +63,5 @@ exports.superTrend = (candles, hlc, period = 10, multiplier = 3) => {
     if (!supertrend[i] && upperBand[i] > upperBand[i - 1])
       upperBand[i] = upperBand[i - 1];
   }
-  return supertrend;
+  return supertrend.slice(-3, -1);
 };

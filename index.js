@@ -45,26 +45,20 @@ const main = async () => {
   }
 };
 main();
-const checkFields = async function (shortCrucialField, longCrucialField, side) {
+const checkFields = async function (shortTrend, longTrend, side) {
   const otherSide = side === 'buy' ? 'sell' : 'buy';
   //checking if theres a change in trends, that both sides are in the same trend thats the GetIn signal
   const conditionGetInPosition =
     side === 'buy'
-      ? (longCrucialField[1] &&
-          !shortCrucialField[0] &&
-          shortCrucialField[1]) ||
-        (shortCrucialField[1] && !longCrucialField[0] && longCrucialField[1])
-      : (!longCrucialField[1] &&
-          shortCrucialField[0] &&
-          !shortCrucialField[1]) ||
-        (!shortCrucialField[1] && longCrucialField[0] && !longCrucialField[1]);
+      ? (longTrend[1] && !shortTrend[0] && shortTrend[1]) ||
+        (shortTrend[1] && !longTrend[0] && longTrend[1])
+      : (!longTrend[1] && shortTrend[0] && !shortTrend[1]) ||
+        (!shortTrend[1] && longTrend[0] && !longTrend[1]);
   // checking if theres a change in one of the trends, so if there are not the same thats the getoutOfposition signal
   const conditionGetOutOfPosition =
     side === 'buy'
-      ? (shortCrucialField[0] && !shortCrucialField[1]) ||
-        (longCrucialField[0] && !longCrucialField[1])
-      : (!shortCrucialField[0] && shortCrucialField[1]) ||
-        (!longCrucialField[0] && longCrucialField[1]);
+      ? (shortTrend[0] && !shortTrend[1]) || (longTrend[0] && !longTrend[1])
+      : (!shortTrend[0] && shortTrend[1]) || (!longTrend[0] && longTrend[1]);
   if (conditionGetInPosition) {
     if (
       !inPosition &&
@@ -91,13 +85,11 @@ const checkFields = async function (shortCrucialField, longCrucialField, side) {
   }
 };
 const checkBuySellSignals = async (shortTrend, longTrend) => {
-  //taking the last two candles and checking if there was a change in the trend and giving buy/sell signals & checking if the longTrend is an uptrend
-  const shortCrucialField = shortTrend.slice(-3, -1);
-  const longCrucialField = longTrend.slice(-3, -1);
+  //Checking if both of the trends are in the same direction, at the point that the change to that position we trade in the direction of the trend
   // const shortCrucialField = [false, true];
   // const longCrucialField = [true, true];
-  await checkFields(shortCrucialField, longCrucialField, 'buy');
-  await checkFields(shortCrucialField, longCrucialField, 'sell');
+  await checkFields(shortTrend, longTrend, 'buy');
+  await checkFields(shortTrend, longTrend, 'sell');
 };
 const checkSLTP = async (orderDetails) => {
   if (!inPosition) return;
