@@ -6,11 +6,14 @@ const orders = require('./utils/orders');
 
 const SL_PRECENTAGE = 0.005;
 const TP_PRECENTAGE = 0.01;
-
+const options = {
+  defaultType: 'margin',
+};
 dotenv.config({ path: './config.env' });
 const exchange = new ccxt.binance({
   apiKey: process.env.API_KEY,
   secret: process.env.API_SECRET,
+  options,
 });
 let candles,
   hlc,
@@ -91,6 +94,8 @@ const checkBuySellSignals = async (shortTrend, longTrend) => {
   //taking the last two candles and checking if there was a change in the trend and giving buy/sell signals & checking if the longTrend is an uptrend
   const shortCrucialField = shortTrend.slice(-3, -1);
   const longCrucialField = longTrend.slice(-3, -1);
+  // const shortCrucialField = [false, true];
+  // const longCrucialField = [true, true];
   await checkFields(shortCrucialField, longCrucialField, 'buy');
   await checkFields(shortCrucialField, longCrucialField, 'sell');
 };
